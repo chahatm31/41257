@@ -11,12 +11,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   ChevronUp,
   ChevronDown,
   MessageSquare,
-  Share,
   Bookmark,
   PlusCircle,
+  Menu,
 } from "lucide-react";
 
 const initialForumData = {
@@ -73,8 +79,10 @@ const initialForumData = {
   ],
 };
 
-const Sidebar = () => (
-  <div className="hidden sm:block w-64 p-4 bg-gradient-to-b from-purple-600 to-indigo-700 text-white">
+const Sidebar = ({ className }) => (
+  <div
+    className={`${className} w-64 p-4 bg-gradient-to-b from-purple-600 to-indigo-700 text-white`}
+  >
     <h2 className="text-2xl font-bold mb-6">MyForum</h2>
     <nav className="space-y-4">
       {["Home", "Explore", "Bookmarks", "Profile"].map((item) => (
@@ -228,13 +236,6 @@ const Post = ({ post, onVote, onBookmark, onComment }) => {
             <Button
               variant="ghost"
               size="sm"
-              className="p-0 hover:text-purple-500"
-            >
-              <Share className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
               onClick={handleBookmark}
               className={`p-0 ${
                 isBookmarked ? "text-yellow-500" : "hover:text-yellow-500"
@@ -288,6 +289,7 @@ const NewPostDialog = ({ onNewPost }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleSubmit = () => {
     if (title && content) {
@@ -299,11 +301,12 @@ const NewPostDialog = ({ onNewPost }) => {
       setTitle("");
       setContent("");
       setTags("");
+      setOpen(false);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-green-500 hover:bg-green-600 text-white">
           <PlusCircle className="mr-2 h-4 w-4" /> New Post
@@ -419,14 +422,31 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar />
+      <Sidebar className="hidden sm:block" />
       <main className="flex-1 p-4 overflow-y-auto">
         <div className="max-w-3xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-800">
               Latest Discussions
             </h1>
-            <NewPostDialog onNewPost={handleNewPost} />
+            <div className="flex items-center space-x-2">
+              <NewPostDialog onNewPost={handleNewPost} />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="sm:hidden">
+                    <Menu className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {["Home", "Explore", "Bookmarks", "Profile"].map((item) => (
+                    <DropdownMenuItem key={item}>
+                      <span className="mr-2">{getIcon(item)}</span>
+                      {item}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
           <div className="mb-6 flex space-x-4">
             <div className="flex-1">
